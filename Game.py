@@ -25,7 +25,13 @@ class Game:
             if event.type == pygame.KEYDOWN:  # Taste wurde gedrückt
                 if event.key == pygame.K_UP:
                     self.player.startBoost()
+                if event.key == pygame.K_RIGHT:
+                    self.player.rotateLeft()
+                elif event.key == pygame.K_LEFT:
+                    self.player.rotateRight()
             if event.type == pygame.KEYUP:
+                if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+                    self.player.stopRotate()
                 if event.key == pygame.K_UP:
                     self.player.stopBoost()
 
@@ -70,8 +76,8 @@ class Game:
             self.player.loop()
             pygame.display.update()
             self.clock.tick(60)
-        print(self.player.speed)
-        if self.player.speed <= 4:
+        print(self.player.speed_y)
+        if self.player.speed_y <= 4:
             self.youWin = True
         while True:
             for event in pygame.event.get():

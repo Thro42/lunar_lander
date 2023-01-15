@@ -1,5 +1,6 @@
 import pygame
 import pygame.math
+import math
 import Game
 
 class Player:
@@ -8,9 +9,11 @@ class Player:
         self.life = True
         self.boost_on = False
         self.draw_center = False
-        self.speed = 0
-        self.gavety = 0.05
+        self.speed_y = 0
+        self.speed_x = 0
+        self.gavety = 0.009
         self.angle = 0
+        self.rotateSpeed = 0
         self.posistion = pos
         self.size = size
         self.image_off = pygame.image.load("Images/space-ship-off.png")
@@ -23,24 +26,67 @@ class Player:
     def stopBoost(self):
         self.boost_on = False
 
-    def move(self):
-        self.speed += self.gavety
+    def rotateRight(self):
+        self.rotateSpeed = 1
+
+    def rotateLeft(self):
+        self.rotateSpeed = -1
+
+    def stopRotate(self):
+        self.rotateSpeed = 0
+
+    def rotate(self):
+        self.angle += self.rotateSpeed 
+        if self.angle > 360:
+            self.angle = self.angle - 360
+        if self.angle < 0:
+            self.angle = 360 - self.angle
+
+    def draw(self):
         if self.boost_on:
-            self.speed -= self.gavety * 1.5
-        self.posistion.y += self.speed
+            image = pygame.transform.scale(self.image_on, self.size)
+        else:
+            image = pygame.transform.scale(self.image_off, self.size)
+        #loc = image.get_rect().center
+        image = pygame.transform.rotate(image, self.angle)
+        self.player = image.get_rect(center=self.player.center)
+        #image.get_rect().center = loc
+        self.game.screen.blit(image, self.player)
+
+    def move(self):
+        self.speed_y += self.gavety
+        dlt_x = 0
+        dlt_y = 0
+        if self.boost_on:
+            if self.speed_y < 0:
+                dir = -1
+            else:
+                dir = 1
+            # speed_c = math.sqrt(self.speed_y**2 + self.speed_x**2)
+            F = self.gavety * 2.9
+            dlt_y = (F * math.sin(math.radians(self.angle+-90))) + self.gavety
+            dlt_x = (F * math.cos(math.radians(self.angle+-90))) * -1
+            self.speed_y += dlt_y
+            self.speed_x += dlt_x
+        else:
+            dlt_y = self.gavety
+            self.speed_y += self.gavety
+        print(self.speed_x, self.speed_y, dlt_x, dlt_y)
+        self.posistion.y += self.speed_y
         if self.posistion.y <= 0:
             self.posistion.y = 0
         if self.posistion.y >= (self.game.screen.get_height()-38):
             self.game.game_over = True
             self.posistion.y = (self.game.screen.get_height()-38)
-
+        self.posistion.x += self.speed_x
+        if self.posistion.x < 0:
+          self.posistion.x = self.game.screen.get_width() - self.posistion.x
+        if self.posistion.x > self.game.screen.get_width():
+            self.posistion.x = self.game.screen.get_width() - self.posistion.x
         pos = self.posistion
         self.player = pygame.Rect(pos.x - (self.size.x/2), pos.y - (self.size.y/2), self.size.x, self.size.y)
 
     def loop(self):
-        if self.boost_on:
-            image = pygame.transform.scale(self.image_on, self.size)
-        else:
-            image = pygame.transform.scale(self.image_off, self.size)
+        self.rotate()
         self.move()
-        self.game.screen.blit(image, self.player)
+        self.draw()
