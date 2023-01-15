@@ -11,7 +11,7 @@ class Player:
         self.draw_center = False
         self.speed_y = 0
         self.speed_x = 0
-        self.gavety = 0.009
+        self.gavety = 0.01
         self.angle = 0
         self.rotateSpeed = 0
         self.posistion = pos

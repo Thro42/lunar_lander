@@ -8,6 +8,7 @@ import Player
 GRAY = (199, 184, 196)
 xGRAY = (159, 163, 168)
 BLUE = (0, 0, 255)
+RED = (255, 0, 0)
 
 class Game:
     def __init__(self, breite: int, hoehe: int):
@@ -19,10 +20,12 @@ class Game:
         self.screen = pygame.display.set_mode(size, pygame.RESIZABLE)
         self.goundImage = pygame.image.load("Images/ground.png")
         self.spaceImage =  pygame.image.load("Images/stars.png")
+        self.platformImage =  pygame.image.load("Images/platform.png")
+
         self.initPlayer()
         self.clock = pygame.time.Clock()
         self.endScale = 20
-        self.platform = pygame.Rect(randint(20, breite-100), hoehe-15, 80, 15 )
+        self.platform = pygame.Rect(randint(20, breite-120), hoehe-15, 100, 15 )
 
     def HandleKeybord(self):
         # Tastatur befele verarbeiten
@@ -46,9 +49,11 @@ class Game:
         winRect = pygame.Rect(0, 0, self.screen.get_width(), self.screen.get_height())
         goundImage = pygame.transform.scale(self.goundImage, (self.screen.get_width(), self.screen.get_height()))
         spaceImage = pygame.transform.scale(self.spaceImage, (self.screen.get_width(), self.screen.get_height()))
+        platformImage = pygame.transform.scale(self.platformImage, (self.platform.width, self.platform.height ))
         self.screen.blit(spaceImage, winRect)
         self.screen.blit(goundImage, winRect)
-        pygame.draw.rect(self.screen,GRAY, self.platform,10)
+        self.screen.blit(platformImage, self.platform)
+        #pygame.draw.rect(self.screen,GRAY, self.platform,10)
 
 
     def initPlayer(self):
@@ -76,12 +81,18 @@ class Game:
             self.screen.blit(self.gameover, imgrec)
 
     def checkLandet(self):
-         platform = pygame.Rect(self.platform.x+10,self.platform.y,self.platform.width-10,self.platform.height)
-         player = pygame.Rect(self.player.player.x,self.player.player.y,self.player.player.width,self.player.player.height-10)
-         if player.colliderect(platform):
+        platform = pygame.Rect(self.platform.x+15,self.platform.y,self.platform.width-30,self.platform.height)
+        player = pygame.Rect(self.player.player.x,self.player.player.y,self.player.player.width,self.player.player.height-10)
+        #pygame.draw.rect(self.screen,BLUE, platform,1)
+        #pygame.draw.rect(self.screen,BLUE, player,1)
+        if player.colliderect(platform):
+            #pygame.draw.rect(self.screen,RED, platform,1)
+            #pygame.draw.rect(self.screen,RED, player,1)
             angle = abs(self.player.angle)
             if angle >= 360:
                 angle = 0
+            if angle > 180:
+                360 - angle
             print("Landing",self.player.speed_y,abs(self.player.speed_x),angle)
             if self.player.speed_y <= 1.1 and abs(self.player.speed_x) <1 and angle < 10:
                 self.game_over = True
@@ -100,8 +111,6 @@ class Game:
             pygame.display.update()
             self.clock.tick(60)
         print(self.player.speed_y)
-        #if self.player.speed_y <= 4:
-        #    self.youWin = True
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
