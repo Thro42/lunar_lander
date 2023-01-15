@@ -47,10 +47,8 @@ class Player:
             image = pygame.transform.scale(self.image_on, self.size)
         else:
             image = pygame.transform.scale(self.image_off, self.size)
-        #loc = image.get_rect().center
         image = pygame.transform.rotate(image, self.angle)
         self.player = image.get_rect(center=self.player.center)
-        #image.get_rect().center = loc
         self.game.screen.blit(image, self.player)
 
     def move(self):
@@ -62,16 +60,15 @@ class Player:
                 dir = -1
             else:
                 dir = 1
-            # speed_c = math.sqrt(self.speed_y**2 + self.speed_x**2)
             F = self.gavety * 2.9
-            dlt_y = (F * math.sin(math.radians(self.angle+-90))) + self.gavety
-            dlt_x = (F * math.cos(math.radians(self.angle+-90))) * -1
+            dlt_y = (F * math.sin(math.radians(self.angle-90))) + self.gavety
+            dlt_x = (F * math.cos(math.radians(self.angle-90))) * -1
             self.speed_y += dlt_y
             self.speed_x += dlt_x
         else:
             dlt_y = self.gavety
             self.speed_y += self.gavety
-        print(self.speed_x, self.speed_y, dlt_x, dlt_y)
+        print(" Speed", self.speed_x, self.speed_y, self.angle)
         self.posistion.y += self.speed_y
         if self.posistion.y <= 0:
             self.posistion.y = 0
@@ -82,7 +79,7 @@ class Player:
         if self.posistion.x < 0:
           self.posistion.x = self.game.screen.get_width() - self.posistion.x
         if self.posistion.x > self.game.screen.get_width():
-            self.posistion.x = self.game.screen.get_width() - self.posistion.x
+            self.posistion.x = self.posistion.x - self.game.screen.get_width() 
         pos = self.posistion
         self.player = pygame.Rect(pos.x - (self.size.x/2), pos.y - (self.size.y/2), self.size.x, self.size.y)
 

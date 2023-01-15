@@ -1,7 +1,13 @@
 import pygame
 import pygame.math
 import sys
+from random import randint
 import Player
+
+#Farben
+GRAY = (199, 184, 196)
+xGRAY = (159, 163, 168)
+BLUE = (0, 0, 255)
 
 class Game:
     def __init__(self, breite: int, hoehe: int):
@@ -16,6 +22,7 @@ class Game:
         self.initPlayer()
         self.clock = pygame.time.Clock()
         self.endScale = 20
+        self.platform = pygame.Rect(randint(20, breite-100), hoehe-15, 80, 15 )
 
     def HandleKeybord(self):
         # Tastatur befele verarbeiten
@@ -41,6 +48,8 @@ class Game:
         spaceImage = pygame.transform.scale(self.spaceImage, (self.screen.get_width(), self.screen.get_height()))
         self.screen.blit(spaceImage, winRect)
         self.screen.blit(goundImage, winRect)
+        pygame.draw.rect(self.screen,GRAY, self.platform,10)
+
 
     def initPlayer(self):
         # Init the Player
@@ -66,6 +75,19 @@ class Game:
         else:
             self.screen.blit(self.gameover, imgrec)
 
+    def checkLandet(self):
+         platform = pygame.Rect(self.platform.x+10,self.platform.y,self.platform.width-10,self.platform.height)
+         player = pygame.Rect(self.player.player.x,self.player.player.y,self.player.player.width,self.player.player.height-10)
+         if player.colliderect(platform):
+            angle = abs(self.player.angle)
+            if angle >= 360:
+                angle = 0
+            print("Landing",self.player.speed_y,abs(self.player.speed_x),angle)
+            if self.player.speed_y <= 1.1 and abs(self.player.speed_x) <1 and angle < 10:
+                self.game_over = True
+                self.youWin = True
+
+
     def loop(self):
         # -------- Main Program Loop -----------
         while not self.game_over:
@@ -74,11 +96,12 @@ class Game:
             # self.screen.fill(GRAY)
             self.darawBackground()
             self.player.loop()
+            self.checkLandet()
             pygame.display.update()
             self.clock.tick(60)
         print(self.player.speed_y)
-        if self.player.speed_y <= 4:
-            self.youWin = True
+        #if self.player.speed_y <= 4:
+        #    self.youWin = True
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
